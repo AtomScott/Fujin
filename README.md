@@ -1,4 +1,6 @@
-# Fujin
+# Fujin (*foo-jin*)
+
+
 Numpy doc style docstring to kramdown parser.
 
 ## Todo 
