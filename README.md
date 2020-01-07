@@ -1,6 +1,6 @@
 # Fujin (*foo-jin*)
 
-
+Create simple docs with minimal requirements.
 Numpy doc style docstring to kramdown parser.
 
 ## Todo 
