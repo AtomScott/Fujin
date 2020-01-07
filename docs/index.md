@@ -33,3 +33,23 @@ Thats what Fujin is suposed to take care of.
 Have a look in the docs folder of Fujin on github. You might be suprised of how little there is. There is very little code in docs directory because we levarge github pages. With github pages, we can make beautifully themed webpages by simply adding `remote_theme: owner/name` to `_config.yml`.
 
 It's super minimal, so there is a lot you can control!
+
+## What does it do?
+
+Run 
+
+```
+fujin -i Fujin notebooks -o docs/docs
+```
+
+This coverts all docstrings in the .py files (exlcuding `__init__.py` etc.) found under ./Fujin into .md files and all .ipynb files found under ./notebooks into .md files.
+
+It's just super simple!
+
+## Customization
+
+Add additional styles into docs to get to change colors and stuff if you want.
+
+## Todo
+
+- [ ] automatically add links to docs.
