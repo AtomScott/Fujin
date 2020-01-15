@@ -1,7 +1,8 @@
 ---
+title: Fujin.TBD
 layout: post
 parent: reference
-nav_order: True
+nav_order: 1
 ---
 
 # Fujin.fujin

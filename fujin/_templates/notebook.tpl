@@ -1,6 +1,10 @@
+{% extends 'markdown.tpl'%}
+
+{%- block header -%}
 ---
+title: {{ nb.cells[0]['source'][2:] }}
 layout: post
 nav_order: 2
 parent: Notebooks
 ---
-{% extends 'markdown.tpl'%}
+{%- endblock header -%}    

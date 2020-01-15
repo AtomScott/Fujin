@@ -1,3 +1,4 @@
+
 for filename in ./notebooks/*.ipynb; do
-        jupyter nbconvert --to markdown --output-dir ./docs/Notebooks/notebooks ./notebooks/usage.ipynb --template=./fujin/_templates/notebook.tpl
+        jupyter nbconvert --to markdown --output-dir ./docs/notebooks/notebooks ./notebooks/usage.ipynb --template=./fujin/_templates/notebook.tpl
 done
