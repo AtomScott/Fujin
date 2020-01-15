@@ -1,15 +1,15 @@
-git checkout gh-pages
+git checkout gh-pages --quiet
 for filename in ./.docs/**; do
-        git checkout master $filename
+        git checkout master $filename --quiet
 done
 
-cd docs
+cd .docs
 for filename in *; do
         mv $filename ../$filename -f
 done
 cd ../
 
-git add . --quiet
+git add .
 git commit -m "Automatic update by fujin"
 git push
-git checkout master
+git checkout master --quiet
