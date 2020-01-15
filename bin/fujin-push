@@ -1,3 +1,15 @@
-for filename in ./docs/**/; do
-        echo $filename
+git checkout -b gh-pages
+for filename in ./docs/**; do
+        git checkout master $filename
 done
+
+cd docs
+for filename in *; do
+        mv $filename ../$filename -f
+done
+cd ../
+
+git add .
+git commit -m "Automatic update by fujin"
+git push
+git checkout master
