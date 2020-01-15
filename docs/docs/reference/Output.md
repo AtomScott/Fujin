@@ -1,6 +1,6 @@
 ---
 layout: post
-parent: API Reference
+parent: reference
 nav_order: 2
 ---
 

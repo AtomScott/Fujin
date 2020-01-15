@@ -1,7 +1,7 @@
 ---
 layout: post
 nav_order: 2
-parent: Notebooks
+parent: notebooks
 ---
 
 # Sample Notebook
