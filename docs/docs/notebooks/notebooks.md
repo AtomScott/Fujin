@@ -1,7 +1,7 @@
 ---
-layout: default
 title: Notebooks
-nav_order: 3
+layout: default
+nav_order: 2
 has_children: true
 ---
 

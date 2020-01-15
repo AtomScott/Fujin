@@ -1,6 +1,6 @@
 ---
 title: {{ module }}.{{ name }}
-layout: post
+layout: default
 parent: API Reference
 nav_order: 1
 ---

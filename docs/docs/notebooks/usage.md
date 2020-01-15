@@ -1,8 +1,8 @@
 ---
 title: Sample Notebook
-layout: post
-nav_order: 1
+layout: default
 parent: Notebooks
+nav_order: 1
 ---
 # Sample Notebook
 
