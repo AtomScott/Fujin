@@ -1,7 +1,7 @@
 ---
 title: Fujin.TBD
 layout: post
-parent: reference
+parent: API Reference
 nav_order: 1
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Sample Notebook
 layout: post
-nav_order: 2
+nav_order: 1
 parent: Notebooks
 ---
 # Sample Notebook

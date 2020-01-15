@@ -1,7 +1,8 @@
 ---
+title: foo
 layout: post
-parent: reference
-nav_order: 2
+parent: API Reference
+nav_order: 1
 ---
 
 # foo
