@@ -1,0 +1,3 @@
+for filename in ./notebooks/*.ipynb; do
+        jupyter nbconvert --to markdown --output-dir ./docs/notebooks $filename
+done

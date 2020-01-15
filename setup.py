@@ -11,5 +11,9 @@ setup(name='fujin',
       install_requires=[
           'numpydoc',
       ],
-      scripts=['bin/fujin'],
+      scripts=[
+        'bin/fujin',
+        'bin/fujin-nbconvert',
+        'bin/fujin-push'
+      ],
       zip_safe=False)
