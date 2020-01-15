@@ -1,3 +1,9 @@
+---
+layout: post
+title: Home
+nav_order: 1
+---
+
 # Fujin (*foo-jin*)
 
 ## Introduction
@@ -7,7 +13,12 @@ Fujin is a helper package written in python, to help me make simple docs and pro
 
 ## Motivation
 After a few years of programming with python, I found myself in need making repos the following style:
-(Disclaimer: I mostly do data science work)
+(Disclaimer: I mostly do data science work)---
+layout: post
+title: Home
+
+---
+
 
 ```
 +-- Root
