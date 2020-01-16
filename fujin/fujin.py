@@ -13,10 +13,44 @@ import re
 
 from jinja2 import Environment, FileSystemLoader
 
+from .base import Funky, Classy
+
 import warnings
 warnings.filterwarnings("ignore")
 
 class Fujin():
+    """Fujin Base class
+
+    The Fujin class handles the nits and bits to parse Numpy Style Docstrings.
+    
+    Fujin does the following things for us.
+
+    - Finds all the modules defined in a package.
+    - Parses the Numpy style docstrings using the NumpyDoc package.
+    - Generates a dictionaries that contain parsed docstring information.
+    - Generates markdown files for each class and function with Jinja2 templates.
+    
+    Attributes
+    ----------
+    modules : 
+        List of modules found in the package
+    members : 
+        list of members found in the package
+    docs : 
+        list of Numpy style docstrings found in the package
+
+    Returns
+    -------
+    [type]
+        [description]
+    
+    Raises
+    ------
+    NotImplementedError
+        [description]
+    KeyError
+        [description]
+    """
     def __init__(self, package_dirs, out_dir, args=defaultdict(lambda: '')):
         self.package_dirs = package_dirs
         self.modules = self.get_modules()
@@ -25,107 +59,26 @@ class Fujin():
         self.args = args
         self.out_dir = out_dir
 
+        file_loader = FileSystemLoader('fujin/_templates')
+        self.env = Environment(
+            loader=file_loader,
+            trim_blocks=True,
+            lstrip_blocks=True
+        )
+
     def generate_docs(self):
+        """Generate markdown files
+        """
         for module in self.modules:
-            out_path = os.path.join(self.out_dir, self.args['prefix'] + module + self.args['suffix'] + '.md')
-            with open(out_path,"w+") as f:
-                f.write(self.get_yaml(module))
-                for doc in self.docs:
-                    f.write(self.get_doctext(doc))
-
-
-    def get_text(self, key, item):
-        if key == 'Signature':
-            return self.parse_signature(key, item)
-        if key in ['Summary', 'Extended Summary']: 
-            return self.parse_text(item)
-        if key in ['Parameters', 'Returns', 'Yields', 'Receives', 'Raises', 'Warns', 'Other Parameters']:
-            return self.parse_section(key, item)
-        if key in ['Notes', 'Warnings', 'References', 'Examples']:
-            return self.parse_block(key, item)
-        if key == 'See Also': 
-            return self.parse_color_block(key, item)
-        if key == 'Methods': 
-            return self.parse_methods(key, item)
-        if key == 'index': 
-            raise NotImplementedError(key, item)
-        else:
-            raise KeyError(key, item)
-
-    def get_doctext(self, doc):
-        doctext = []
-        for key, item in doc._parsed_data.items():
-            if item: # filter for empty collections and None
-                try: 
-                    txt = self.get_text(key, item)
-                except NotImplementedError as e:
-                    txt = ''
-                    print('\t\t Error: {0} autodoc has not been implemented yet'.format(key))
-                except KeyError as e:
-                    txt = ''
-                    print('\t\t Error : {0} is not Numpy style docstring'.format(key))
-                doctext.append(txt)
-        return '\n'.join(doctext)
-
-
-    def parse_signature(self, key, item):
-        match = re.match(r"(.*)\((.*)\)" ,item)
-        if match:
-            name, so = match.groups()
-            return '#### **{0}(** *{1}*  **)** {{#signature}}\n'.format(name, so)
-        else:
-            return '\n'
-
-    def parse_text(self, item, sep='\n'):
-        # if >>> is code block
-        # if .. math:: or :math: is math 
-        for i, s in enumerate(item):
-            if s.startswith('>>>'): 
-                item.insert(i, '~~~python')
-                item.append('~~~')
-                break
-            elif s.startswith('.. math::'):
-                item[i] = item[i].replace('.. math::', '$$\n')
-                while True:
-                    i += 1
-                    if i >= len(item): break
-                    if not item[i].startswith('\t'): break
-                item.insert(i, '$$')
-            math = re.match(r"(.*):math:`(.*)`(.*)" ,s)
-            if math:
-                item[i] = '$$'.join(math.groups())
-        
-        return sep.join(item)
-
-    def parse_section(self, key, item):
-        s = ['##### {0} {{#section}}\n'.format(key), '<dl>']
-        for p in item: 
-            # p[0] param name, p[1] param type, p[2] param desc
-            s.append('<dt markdown=\'1\'>' + '`{0}` : *{1}*'.format(p[0] if p[1] else " ", p[1]) + '\n</dt>')
-            s += ["\t<dd markdown=\'1\'> {0} \n</dd>\n".format(''.join(p[2]))]
-        s.append('</dl>')
-        s.append('')
-        return '\n'.join(s)
-
-    def parse_block(self, key, item):
-        s = ['##### {0} {{#block-header}}'.format(key)]
-        s.append(self.parse_text(item))
-        return '\n'.join(s)
-
-    def parse_color_block(self, key, item):
-        s = ['##### **{0}**'.format(key)]
-        for lst, desc in item:
-            names = ', '.join([name for name, _ in lst])
-            s.append(': '.join([names, self.parse_text(desc, ' ')]))
-        return '<div class=\'color-block\' markdown=\'1\'>'+'\n'.join(s)+'\n</div>'
-
-    def parse_methods(self, key, item):
-        s = []
-        for name, _, lst in item:
-            doc = NumpyDocString('\n'.join(lst))
-            doc._parsed_data['Signature'] = name
-            s.append(self.get_doctext(doc))
-        return '\n'.join(s)
+            for doc in self.docs:
+                out_path = os.path.join(self.out_dir, self.args['prefix'] + module + self.args['suffix'] + '.md') # TODO
+                if doc.type == 'class':
+                    template = env.get_template('api-reference-class.tpl')
+                elif doc.type == 'function':
+                    template = env.get_template('api-reference-func.tpl')
+                else:
+                    raise KeyError(doc.type)
+                doc.write(out_path, template)
 
     def get_modules(self):
         """Returns the modules in a Fujin obj.
@@ -198,66 +151,46 @@ class Fujin():
             for name, obj in getmembers(module):
                 if self.ismember(obj) and obj.__module__ == module.__name__:
                     if isfunction(obj):
-                        objs.append(FunctionDoc(obj))
+                        objs.append(Funky(obj))
                     elif isclass(obj):
-                        objs.append(ClassDoc(obj))
+                        objs.append(Classy(obj))
         return objs
 
-
-    def get_yaml(self, mod):
-        mod = importlib.import_module(mod)
-        yam = '\n'.join([ \
-            '---',
-            'layout: post',
-            'title: {0}'.format(mod.__name__),
-            'description: >',
-            ' '+mod.__doc__,
-            '---', '\n'])
-        return yam
-
-        # yam += '# ' +  '{0}'.format(mod.__name__) + '\n'
-
-        # if short_desc != ' ':
-        #     yam += '\n'.join([
-        #         '## Description', 
-        #         '{0}'.format(mod.__doc__)])
-
-        # yam += '---\n'
     def ismember(self, obj):
         return isfunction(obj) or isclass(obj)
 
 
-def parse_args():
-    """Parse args From the command line
-    """        
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('-o','--out_dir', default='./docs')
-    parser.add_argument('-i','--input_dirs', nargs='+', help='<Required> Set flag', required=True)
-    parser.add_argument('-x','--overwrite', action='store_true', default=False)
-    parser.add_argument('-p','--prefix', default='./docs')
-    parser.add_argument('-s','--suffix', default='')
-    args = parser.parse_args()
-    return args
+# def parse_args():
+#     """Parse args From the command line
+#     """        
+#     parser = argparse.ArgumentParser(description='Process some integers.')
+#     parser.add_argument('-o','--out_dir', default='./docs')
+#     parser.add_argument('-i','--input_dirs', nargs='+', help='<Required> Set flag', required=True)
+#     parser.add_argument('-x','--overwrite', action='store_true', default=False)
+#     parser.add_argument('-p','--prefix', default='./docs')
+#     parser.add_argument('-s','--suffix', default='')
+#     args = parser.parse_args()
+#     return args
 
 
-def tester_func(a,b,c):
-    """Func to test fujin functionality
+# def tester_func(a,b,c):
+#     """Func to test fujin functionality
     
-    Parameters
-    ----------
-    a : int
-        variable a
-    b : int
-        variable b
-    c : int
-        variable c
+#     Parameters
+#     ----------
+#     a : int
+#         variable a
+#     b : int
+#         variable b
+#     c : int
+#         variable c
     
-    Returns
-    -------
-    hey
-        a+b+c
-    """    
-    return a+b+c
+#     Returns
+#     -------
+#     hey
+#         a+b+c
+#     """    
+#     return a+b+c
 
 
             

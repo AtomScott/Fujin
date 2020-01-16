@@ -10,27 +10,45 @@ nav_order: 1
 ## *Function* {{ module }}.{{ name }}
 {{ data['Signature'] }}
 
-<table>
-{% for section in sections %}
-{% set param_list = data[section] %}
-{% if param_list|length > 1 %}
-<tr>
-    <th rowspan={{param_list|length}}>{{ section }}</th>
-</tr>
+
+{% for section in sections %}{% set param_list = data[section] %}
+{% if param_list|length > 0 %}
+| {{ section }} |   |   |
+| - | - | - | - |
 {% for param in param_list %}
-<tr>
-    <th>{{ param.name }} : {{ param.int }}</th>
-    <td>
-        <dl>
-            <dd>
-            <div markdown='1'>
-            {{ '.'.join(param.desc) }}
-            </div>
-            </dd>
-        </dl>
-    </td>
-</tr>
+|   | {{ param.name }} : {{ param.int }} | {{ '.'.join(param.desc) }} |
 {% endfor %}   
+{% endif %}{% endfor %}
+
+{% if data['See also'] > 0 %}
+<div>
+**See also**
+{{ '.'.join(data['See also']) }}
+</div>
 {% endif %}
+
+{% if data['Warning'] > 0 %}
+<div>
+**See also**
+{{ '\n'.join(data['Warning']) }}
+</div>
+{% endif %}
+
+
+{% for note in notes %}{% set note_list = data[note] %}
+{% if note_list|length > 0 %}
+### {{ note }}
+---
+{{ '.'.join(note_list) }}
+{% endif %}{% endfor %}
+
+{% if data['Examples'] > 0 %}
+### Examples
+---
+{% for text, code in data['Examples'] %}
+{{ text }}
+```python
+{{ code }}
+```
 {% endfor %}
-</table>  
+{% endif %}
